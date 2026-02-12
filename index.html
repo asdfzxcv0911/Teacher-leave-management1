@@ -6,76 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>教師請假精算系統</title>
     <style>
-        /* 全域重置，確保全螢幕感 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: #f0f2f5;
-            overflow: hidden; /* 防止背景捲動 */
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #f0f2f5; overflow: hidden; }
+        body { font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; }
 
-        body { 
-            font-family: "Microsoft JhengHei", sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-        }
-
-        /* 核心卡片容器 */
         .card { 
             background: white; 
             display: flex;
             flex-direction: column;
             width: 100%;
             height: 100%;
-            max-width: 700px; /* 電腦版最大寬度 */
+            max-width: 700px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
             overflow: hidden;
         }
 
-        /* 電腦版樣式修正 */
         @media (min-width: 601px) {
             body { padding: 20px; }
-            .card { 
-                height: auto; 
-                max-height: 95vh; 
-                border-radius: 20px; 
-            }
+            .card { height: auto; max-height: 95vh; border-radius: 20px; }
         }
 
-        /* 手機版 App 全螢幕優化 */
         @media (max-width: 600px) {
-            .card {
-                max-width: 100vw;
-                height: 100vh;
-                border-radius: 0;
-                padding-top: env(safe-area-inset-top); /* 避開 iPhone 瀏海 */
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            /* 強制 9:16 的佈局比例感，但不鎖死高度，避免內容塞不下 */
-            .content-wrapper { flex: 1; overflow-y: auto; padding: 15px; }
-            h2 { font-size: 1.2rem !important; margin: 10px 0 !important; }
+            .card { max-width: 100vw; height: 100vh; border-radius: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         }
 
-        .content-wrapper {
-            padding: 20px;
-            overflow-y: auto;
-            scrollbar-width: none; /* Firefox 隱藏捲動條 */
-        }
-        .content-wrapper::-webkit-scrollbar { display: none; } /* Chrome 隱藏捲動條 */
+        .content-wrapper { padding: 20px; overflow-y: auto; scrollbar-width: none; flex: 1; }
+        .content-wrapper::-webkit-scrollbar { display: none; }
 
         h2 { color: #202124; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        .section { padding: 12px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .section { padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #ddd; }
         .setup-bg { background: #fffde7; border-color: #ffe082; } 
         .apply-bg { background: #e8f0fe; border-color: #c2d7ff; } 
         .cancel-bg { background: #fbe9e7; border-color: #ffccbc; } 
-        
+        .history-bg { background: #f5f5f5; border-color: #ddd; }
+
         .section-title { font-weight: bold; margin-bottom: 8px; display: block; font-size: 14px; }
-        .row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; flex-wrap: nowrap; }
+        .row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
         
         select { padding: 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; background: white; }
         .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; color: white; font-weight: bold; font-size: 13px; flex-shrink: 0; }
@@ -91,11 +58,18 @@
         .personal-summary-row { background-color: #ffe0b2 !important; font-weight: bold; color: #e65100; }
 
         .final-analysis-card { background-color: #e8f5e9; border: 2px solid #4caf50; padding: 15px; border-radius: 10px; margin-top: 15px; }
-        .analysis-title { color: #2e7d32; font-size: 15px; font-weight: bold; margin-bottom: 10px; display: block; text-align: center; }
-        .analysis-line { font-size: 13px; line-height: 2; color: #333; display: flex; justify-content: space-between; }
+        .analysis-line { font-size: 13px; line-height: 2; display: flex; justify-content: space-between; }
         .highlight-num { color: #d32f2f; font-weight: bold; font-size: 16px; }
 
-        .btn-reset { width: 100%; background: none; color: #ccc; border: none; cursor: pointer; margin-top: 15px; font-size: 11px; text-decoration: underline; padding-bottom: 20px; }
+        /* 歷史紀錄樣式 */
+        .history-list { font-size: 11px; max-height: 150px; overflow-y: auto; background: white; border-radius: 5px; border: 1px solid #eee; margin-top: 5px; }
+        .history-item { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; }
+        .h-time { color: #888; margin-right: 5px; }
+        .h-type { font-weight: bold; }
+        .h-action-apply { color: #1a73e8; }
+        .h-action-cancel { color: #d32f2f; }
+
+        .btn-reset { width: 100%; background: none; color: #ccc; border: none; cursor: pointer; margin-top: 20px; font-size: 11px; text-decoration: underline; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -115,8 +89,7 @@
             </div>
             <div class="row">
                 <select id="compType" style="flex:1;"><option value="加班補休">加班補休</option><option value="公假補休">公假補休</option></select>
-                <select id="addDays"></select>日
-                <select id="addHours"></select>時
+                <select id="addDays"></select>日 <select id="addHours"></select>時
                 <button class="btn btn-add" onclick="addCompLimit()">存入</button>
             </div>
         </div>
@@ -129,8 +102,7 @@
                     <option value="家庭照顧假">家庭照顧假</option><option value="病假">病假</option>
                     <option value="特休">特休</option><option value="加班補休">加班補休</option><option value="公假補休">公假補休</option>
                 </select>
-                <select id="leaveDays"></select>日
-                <select id="leaveHours"></select>時
+                <select id="leaveDays"></select>日 <select id="leaveHours"></select>時
                 <button class="btn btn-apply" onclick="applyLeave()">送出</button>
             </div>
         </div>
@@ -143,9 +115,15 @@
                     <option value="家庭照顧假">家庭照顧假</option><option value="病假">病假</option>
                     <option value="特休">特休</option><option value="加班補休">加班補休</option><option value="公假補休">公假補休</option>
                 </select>
-                <select id="cancelDays"></select>日
-                <select id="cancelHours"></select>時
+                <select id="cancelDays"></select>日 <select id="cancelHours"></select>時
                 <button class="btn btn-cancel" onclick="cancelLeave()">銷假</button>
+            </div>
+        </div>
+
+        <div class="section history-bg">
+            <span class="section-title" style="color:#555;">📜 歷史異動紀錄</span>
+            <div class="history-list" id="historyList">
+                <div style="text-align:center; color:#999; padding:10px;">尚無紀錄</div>
             </div>
         </div>
 
@@ -170,15 +148,30 @@
         });
     }
 
-    let state = JSON.parse(localStorage.getItem('teacher_leave_final_app')) || {
+    let state = JSON.parse(localStorage.getItem('teacher_leave_history_v1')) || {
         limits: { "身心調適假": 24, "事假": 56, "家庭照顧假": 56, "病假": 224, "特休": 0, "加班補休": 0, "公假補休": 0 },
         used: { "身心調適假": 0, "事假": 0, "家庭照顧假": 0, "病假": 0, "特休": 0, "加班補休": 0, "公假補休": 0 },
-        settings: { annualDays: "0" }
+        settings: { annualDays: "0" },
+        history: [] // 儲存歷史紀錄
     };
 
     function formatTime(totalH) {
         if (totalH < 0) return "0日0時";
         return Math.floor(totalH / 8) + "日" + (totalH % 8) + "時";
+    }
+
+    // 紀錄歷史功能
+    function addLog(action, type, d, h) {
+        const now = new Date();
+        const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+        const entry = {
+            time: timeStr,
+            action: action,
+            type: type,
+            amount: `${d}日${h}時`
+        };
+        state.history.unshift(entry); // 新紀錄在最上面
+        if(state.history.length > 30) state.history.pop(); // 最多存30筆
     }
 
     function addCompLimit() {
@@ -198,12 +191,25 @@
     }
 
     function updateView() {
-        localStorage.setItem('teacher_leave_final_app', JSON.stringify(state));
+        localStorage.setItem('teacher_leave_history_v1', JSON.stringify(state));
         document.getElementById('annualLeaveInput').value = state.settings.annualDays;
         
+        // 更新歷史列表
+        const listEl = document.getElementById('historyList');
+        if (state.history.length === 0) {
+            listEl.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">尚無紀錄</div>';
+        } else {
+            listEl.innerHTML = state.history.map(h => `
+                <div class="history-item">
+                    <span><span class="h-time">${h.time}</span> <span class="h-type">${h.type}</span></span>
+                    <span class="${h.action==='請假'?'h-action-apply':'h-action-cancel'}">${h.action} ${h.amount}</span>
+                </div>
+            `).join('');
+        }
+
+        // 更新表格
         let html = `<table><tr><th>假別名稱</th><th>已用時數</th><th>剩餘時數</th></tr>`;
         const keys = ["身心調適假", "事假", "家庭照顧假", "病假", "特休", "加班補休", "公假補休"];
-        
         keys.forEach(key => {
             let isPersonal = ["事假", "身心調適假", "家庭照顧假"].includes(key);
             let rowClass = isPersonal ? 'class="personal-group-row"' : '';
@@ -222,7 +228,7 @@
         let compRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]); 
 
         document.getElementById('analysisPanel').innerHTML = `
-            <span class="analysis-title">📊 學期剩餘假精算 (不扣考績)</span>
+            <span style="color:#2e7d32; font-size:15px; font-weight:bold; text-align:center; display:block; margin-bottom:10px;">📊 學期剩餘假精算 (不扣考績)</span>
             <div class="analysis-line"><span>● 事病假安全餘額 (14日內)</span> <span>${formatTime(safetyRem)}</span></div>
             <div class="analysis-line"><span>● 特休可用餘額 (10日內)</span> <span>${formatTime(specRem)}</span></div>
             <div class="analysis-line"><span>● 補休合計餘額</span> <span>${formatTime(compRem)}</span></div>
@@ -244,6 +250,7 @@
             if (pUsed > 56) return alert("事假體系不可超過 7 日");
         }
         state.used[type] += total;
+        addLog("請假", type, d, h); // 寫入紀錄
         updateView();
         alert("登記成功");
     }
@@ -254,12 +261,17 @@
         let h = parseInt(document.getElementById('cancelHours').value);
         let total = (d * 8) + h;
         if (total <= 0) return;
-        state.used[type] = Math.max(0, state.used[type] - total);
+        if (state.used[type] - total < 0) {
+            alert("銷假時數不可超過已使用時數");
+            return;
+        }
+        state.used[type] -= total;
+        addLog("銷假", type, d, h); // 寫入紀錄
         updateView();
         alert("銷假成功");
     }
 
-    function resetData() { if(confirm("確定重置所有數據？")) { localStorage.clear(); location.reload(); } }
+    function resetData() { if(confirm("確定重置所有數據與紀錄？")) { localStorage.clear(); location.reload(); } }
 
     initDropdowns();
     updateView();
