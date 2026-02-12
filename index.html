@@ -44,9 +44,9 @@
         h2 { color: #202124; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
         .section { padding: 10px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #ddd; }
-        .setup-bg { background: #fffde7; border-color: #ffe082; } /* 存入補休-黃 */
-        .apply-bg { background: #e8f0fe; border-color: #c2d7ff; } /* 請假登記-藍 */
-        .cancel-bg { background: #fbe9e7; border-color: #ffccbc; } /* 銷假登記-紅 */
+        .setup-bg { background: #fffde7; border-color: #ffe082; } /* 存入補休 */
+        .apply-bg { background: #e8f0fe; border-color: #c2d7ff; } /* 請假登記 */
+        .cancel-bg { background: #fbe9e7; border-color: #ffccbc; } /* 銷假登記 */
         
         .section-title { font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; }
         .setup-row { display: flex; gap: 4px; align-items: center; margin-bottom: 5px; }
@@ -64,9 +64,10 @@
         .personal-group-row { background-color: #fff8f0 !important; }
         .personal-summary-row { background-color: #ffe0b2 !important; font-weight: bold; color: #e65100; }
 
-        .final-analysis-card { background-color: #e8f5e9; border: 1px solid #4caf50; padding: 10px; border-radius: 8px; margin-top: 10px; }
-        .analysis-title { color: #2e7d32; font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block; text-align: center; }
-        .highlight-num { color: #d32f2f; font-weight: bold; }
+        .final-analysis-card { background-color: #e8f5e9; border: 2px solid #4caf50; padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .analysis-title { color: #2e7d32; font-size: 14px; font-weight: bold; margin-bottom: 8px; display: block; text-align: center; }
+        .analysis-line { font-size: 12px; line-height: 1.8; color: #333; display: flex; justify-content: space-between; }
+        .highlight-num { color: #d32f2f; font-weight: bold; font-size: 15px; }
 
         .btn-reset { width: 100%; background: none; color: #ccc; border: none; cursor: pointer; margin-top: 10px; font-size: 10px; text-decoration: underline; }
     </style>
@@ -79,14 +80,17 @@
     <div class="section setup-bg">
         <span class="section-title" style="color:#f57c00;">⚙️ 存入補休額度</span>
         <div class="setup-row">
-            <label>特休：</label>
+            <label>特休天數：</label>
             <select id="annualLeaveInput" onchange="updateLimits()">
                 <option value="0">0天</option><option value="7">7天</option><option value="14">14天</option>
                 <option value="21">21天</option><option value="28">28天</option><option value="30">30天</option>
             </select>
         </div>
         <div class="setup-row">
-            <select id="compType" style="width:70px;"><option value="加班補休">加班</option><option value="公假補休">公假</option></select>
+            <select id="compType" style="width:90px;">
+                <option value="加班補休">加班補休</option>
+                <option value="公假補休">公假補休</option>
+            </select>
             <select id="addDays"></select>日
             <select id="addHours"></select>時
             <button class="btn btn-add" onclick="addCompLimit()">存入</button>
@@ -97,10 +101,13 @@
         <span class="section-title" style="color:#1a73e8;">📝 請假登記 (扣除額度)</span>
         <div class="setup-row">
             <select id="leaveType" style="flex-grow:1;">
-                <option value="身心調適假">身心優先(3d)</option>
-                <option value="事假">事假</option><option value="家庭照顧假">家照</option>
-                <option value="病假">病假</option><option value="特休">特休</option>
-                <option value="加班補休">加補</option><option value="公假補休">公補</option>
+                <option value="身心調適假">身心調適假</option>
+                <option value="事假">事假</option>
+                <option value="家庭照顧假">家庭照顧假</option>
+                <option value="病假">病假</option>
+                <option value="特休">特休</option>
+                <option value="加班補休">加班補休</option>
+                <option value="公假補休">公假補休</option>
             </select>
             <select id="leaveDays"></select>日
             <select id="leaveHours"></select>時
@@ -113,9 +120,12 @@
         <div class="setup-row">
             <select id="cancelType" style="flex-grow:1;">
                 <option value="身心調適假">身心調適假</option>
-                <option value="事假">事假</option><option value="家庭照顧假">家庭照顧假</option>
-                <option value="病假">病假</option><option value="特休">特休</option>
-                <option value="加班補休">加班補休</option><option value="公假補休">公假補休</option>
+                <option value="事假">事假</option>
+                <option value="家庭照顧假">家庭照顧假</option>
+                <option value="病假">病假</option>
+                <option value="特休">特休</option>
+                <option value="加班補休">加班補休</option>
+                <option value="公假補休">公假補休</option>
             </select>
             <select id="cancelDays"></select>日
             <select id="cancelHours"></select>時
@@ -145,7 +155,7 @@
         });
     }
 
-    let state = JSON.parse(localStorage.getItem('teacher_leave_v7')) || {
+    let state = JSON.parse(localStorage.getItem('teacher_leave_v8')) || {
         limits: { "身心調適假": 24, "事假": 56, "家庭照顧假": 56, "病假": 224, "特休": 0, "加班補休": 0, "公假補休": 0 },
         used: { "身心調適假": 0, "事假": 0, "家庭照顧假": 0, "病假": 0, "特休": 0, "加班補休": 0, "公假補休": 0 },
         settings: { annualDays: "0" }
@@ -162,7 +172,7 @@
         let h = parseInt(document.getElementById('addHours').value);
         state.limits[type] += (d * 8 + h);
         updateView();
-        alert("已存入額度");
+        alert("已成功存入額度");
     }
 
     function updateLimits() {
@@ -173,10 +183,10 @@
     }
 
     function updateView() {
-        localStorage.setItem('teacher_leave_v7', JSON.stringify(state));
+        localStorage.setItem('teacher_leave_v8', JSON.stringify(state));
         document.getElementById('annualLeaveInput').value = state.settings.annualDays;
         
-        let html = `<table><tr><th>假別</th><th>已用</th><th>剩餘</th></tr>`;
+        let html = `<table><tr><th>假別名稱</th><th>已用時數</th><th>剩餘時數</th></tr>`;
         const keys = ["身心調適假", "事假", "家庭照顧假", "病假", "特休", "加班補休", "公假補休"];
         
         keys.forEach(key => {
@@ -185,46 +195,46 @@
             html += `<tr ${rowClass}><td>${key}</td><td>${formatTime(state.used[key])}</td><td>${formatTime(state.limits[key] - state.used[key])}</td></tr>`;
             if (key === "家庭照顧假") {
                 let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
-                html += `<tr class="personal-summary-row"><td>事假合計</td><td>${formatTime(pUsed)}</td><td>餘:${formatTime(56 - pUsed)}</td></tr>`;
+                html += `<tr class="personal-summary-row"><td>🔸事假體系合計</td><td>${formatTime(pUsed)}</td><td>餘:${formatTime(56 - pUsed)}</td></tr>`;
             }
         });
         document.getElementById('statusTable').innerHTML = html + `</table>`;
 
-        // 考績精算
+        // --- 核心精算三行呈現邏輯 ---
         let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
-        let safetyRem = Math.max(0, 112 - (pUsed + state.used["病假"]));
-        let specRem = Math.max(0, 80 - state.used["特休"]);
-        let compRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]);
-        
+        let safetyRem = Math.max(0, 112 - (pUsed + state.used["病假"])); // 事病安全線 (14d)
+        let specRem = Math.max(0, 80 - state.used["特休"]);             // 特休限制線 (10d)
+        let compRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]); // 補休
+
         document.getElementById('analysisPanel').innerHTML = `
-            <span class="analysis-title">📊 學期剩餘假精算 (安全線)</span>
-            <div style="font-size:11px; line-height:1.4;">
-                事病安全餘額：${formatTime(safetyRem)} | 特休餘額(10d內)：${formatTime(specRem)}<br>
-                補休合計餘額：${formatTime(compRem)}<br>
-                <strong>💡 不扣考績總計可休：<span class="highlight-num">${formatTime(safetyRem + specRem + compRem)}</span></strong>
+            <span class="analysis-title">📊 學期剩餘假精算 (不扣考績)</span>
+            <div class="analysis-line"><span>● 事病假安全餘額 (14日內)</span> <span>${formatTime(safetyRem)}</span></div>
+            <div class="analysis-line"><span>● 特休可用餘額 (10日內)</span> <span>${formatTime(specRem)}</span></div>
+            <div class="analysis-line"><span>● 補休合計餘額</span> <span>${formatTime(compRem)}</span></div>
+            <div style="margin-top:8px; border-top:1px dashed #4caf50; padding-top:8px; text-align:right;">
+                <strong>💡 總計可休：<span class="highlight-num">${formatTime(safetyRem + specRem + compRem)}</span></strong>
             </div>
         `;
     }
 
-    // 請假登記
     function applyLeave() {
         let type = document.getElementById('leaveType').value;
         let d = parseInt(document.getElementById('leaveDays').value);
         let h = parseInt(document.getElementById('leaveHours').value);
         let total = (d * 8) + h;
         if (total <= 0) return;
-        if (state.used[type] + total > state.limits[type]) return alert("超過該假別上限");
+        if (state.used[type] + total > state.limits[type]) return alert("錯誤：申請時數超過該假別上限！");
         
         // 限制檢核
-        let tempPersonal = (state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"]) + (["事假", "身心調適假", "家庭照顧假"].includes(type) ? total : 0);
-        if (tempPersonal > 56) return alert("事假體系不可超過 7 日");
+        let currentPersonal = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
+        let nextPersonal = currentPersonal + (["事假", "身心調適假", "家庭照顧假"].includes(type) ? total : 0);
+        if (nextPersonal > 56) return alert("錯誤：事假體系（含身心、家照）合計不可超過 7 日！");
 
         state.used[type] += total;
         updateView();
         alert("請假登記成功");
     }
 
-    // 銷假登記 (關鍵新增)
     function cancelLeave() {
         let type = document.getElementById('cancelType').value;
         let d = parseInt(document.getElementById('cancelDays').value);
@@ -233,8 +243,8 @@
         if (total <= 0) return;
         
         if (state.used[type] - total < 0) {
-            alert("銷假時數不可超過已使用時數，系統已自動歸零。");
             state.used[type] = 0;
+            alert("銷假時數超過已用時數，已歸零。");
         } else {
             state.used[type] -= total;
             alert("銷假成功，時數已返還。");
@@ -242,7 +252,7 @@
         updateView();
     }
 
-    function resetData() { if(confirm("確定重置？所有紀錄將消失。")) { localStorage.clear(); location.reload(); } }
+    function resetData() { if(confirm("確定要重置嗎？這將清空所有存檔紀錄！")) { localStorage.clear(); location.reload(); } }
 
     initDropdowns();
     updateView();
