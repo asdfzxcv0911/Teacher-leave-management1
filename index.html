@@ -3,45 +3,65 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta charset="UTF-8">
-    <title>教師請假控管 - 考績精算版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>教師請假時數精算系統</title>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 700px; }
-        h2 { color: #202124; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        /* 基礎樣式 */
+        body { 
+            font-family: "Microsoft JhengHei", sans-serif; 
+            background: #f0f2f5; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            padding: 20px; /* 電腦版留邊 */
+        }
         
-        /* 設定區域 */
+        .card { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 700px; /* 電腦版最大寬度 */
+            box-sizing: border-box;
+        }
+
+        /* --- 手機版全螢幕優化 --- */
+        @media (max-width: 600px) {
+            body { padding: 0; } /* 手機取消外層邊距 */
+            .card { 
+                border-radius: 0; /* 手機取消圓角 */
+                min-height: 100vh; /* 手機填滿高度 */
+                padding: 15px;
+            }
+            h2 { font-size: 1.2rem; }
+            .setup-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            input[type="number"] { width: 100% !important; box-sizing: border-box; }
+            select { width: 100% !important; }
+            .btn-apply, .btn-add { width: 100%; margin-top: 5px; }
+        }
+
+        h2 { color: #202124; text-align: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
         .setup-section { background: #fffde7; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ffe082; }
         .setup-title { font-weight: bold; color: #f57c00; margin-bottom: 10px; display: block; }
-        .setup-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-        
-        /* 輸入區域 */
+        .setup-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
         .input-section { background: #e8f0fe; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #c2d7ff; }
         .input-title { font-weight: bold; color: #1a73e8; margin-bottom: 10px; display: block; }
-        
-        /* 按鈕與輸入 */
-        select, input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
-        .btn-apply { padding: 10px 25px; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .btn-add { padding: 8px 15px; background: #f57c00; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        
-        /* 表格樣式 */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; font-size: 14px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         th { background: #f1f3f4; color: #5f6368; }
-        
-        /* 顏色區分 */
         .personal-group-row { background-color: #fff8f0 !important; }
         .personal-summary-row { background-color: #ffe0b2 !important; font-weight: bold; color: #e65100; border: 2px solid #fb8c00; }
         .final-analysis-card { background-color: #e8f5e9; border: 2px solid #4caf50; padding: 20px; border-radius: 10px; margin-top: 25px; }
-        .analysis-title { color: #2e7d32; font-size: 18px; font-weight: bold; margin-bottom: 15px; display: block; text-align: center; }
-        
-        .highlight-num { font-size: 20px; color: #d32f2f; font-weight: bold; text-decoration: underline; }
+        .analysis-title { color: #2e7d32; font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; display: block; text-align: center; }
+        .highlight-num { font-size: 1.3rem; color: #d32f2f; font-weight: bold; text-decoration: underline; }
         .btn-reset { width: 100%; padding: 5px; background: none; color: #ccc; border: 1px solid #eee; border-radius: 5px; cursor: pointer; margin-top: 30px; font-size: 11px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🍎 教師請假時數精算系統</h2>
+    <h2>🍎 教師請假精算系統 (手機版)</h2>
 
     <div class="setup-section">
         <span class="setup-title">⚙️ 基礎額度設定</span>
@@ -51,15 +71,16 @@
                 <option value="0">0天</option><option value="7">7天</option><option value="14">14天</option>
                 <option value="21">21天</option><option value="28">28天</option><option value="30">30天</option>
             </select>
-            <small>(總量依系統顯示，總結算僅取10天)</small>
         </div>
         <div class="setup-row">
             <label>存入補休：</label>
             <select id="compType">
                 <option value="加班補休">加班補休</option><option value="公假補休">公假補休</option>
             </select>
-            <input type="number" id="addDays" style="width: 45px;" placeholder="日"> <small>日</small>
-            <input type="number" id="addHours" style="width: 45px;" placeholder="時"> <small>時</small>
+            <div>
+                <input type="number" id="addDays" style="width: 45px;" placeholder="日"> 日
+                <input type="number" id="addHours" style="width: 45px;" placeholder="時"> 時
+            </div>
             <button class="btn-add" onclick="addCompLimit()">存入</button>
         </div>
     </div>
@@ -67,9 +88,9 @@
     <div class="input-section">
         <span class="input-title">📝 登記請假</span>
         <div class="setup-row">
-            <label>假別：</label>
+            <label>選擇假別：</label>
             <select id="leaveType" style="flex-grow: 1;">
-                <option value="身心調適假">身心調適假 (優先)</option>
+                <option value="身心調適假">身心調適假 (優先3天)</option>
                 <option value="事假">事假</option>
                 <option value="家庭照顧假">家庭照顧假</option>
                 <option value="病假">病假</option>
@@ -79,23 +100,26 @@
             </select>
         </div>
         <div class="setup-row">
-            <label>時長：</label>
-            <input type="number" id="leaveDays" style="width: 50px;" placeholder="0"> <small>日</small>
-            <input type="number" id="leaveHours" style="width: 50px;" placeholder="0"> <small>時</small>
-            <button class="btn-apply" style="margin-left: auto;" onclick="applyLeave()">送出申請</button>
+            <label>請假時長：</label>
+            <div>
+                <input type="number" id="leaveDays" style="width: 50px;" placeholder="0"> 日
+                <input type="number" id="leaveHours" style="width: 50px;" placeholder="0"> 時
+            </div>
+            <button class="btn-apply" onclick="applyLeave()">送出</button>
         </div>
     </div>
 
-    <div id="statusTable"></div>
+    <div style="overflow-x: auto;">
+        <div id="statusTable"></div>
+    </div>
     
-    <div class="final-analysis-card" id="analysisPanel">
-        </div>
+    <div class="final-analysis-card" id="analysisPanel"></div>
 
-    <button class="btn-reset" onclick="resetData()">重置系統</button>
+    <button class="btn-reset" onclick="resetData()">重置所有數據</button>
 </div>
 
 <script>
-    let state = JSON.parse(localStorage.getItem('teacher_leave_final')) || {
+    let state = JSON.parse(localStorage.getItem('teacher_leave_mobile')) || {
         limits: { "事假": 56, "身心調適假": 24, "家庭照顧假": 56, "病假": 224, "特休": 0, "加班補休": 0, "公假補休": 0 },
         used: { "事假": 0, "身心調適假": 0, "家庭照顧假": 0, "病假": 0, "特休": 0, "加班補休": 0, "公假補休": 0 },
         settings: { annualDays: "0" }
@@ -123,11 +147,10 @@
     }
 
     function updateView() {
-        localStorage.setItem('teacher_leave_final', JSON.stringify(state));
+        localStorage.setItem('teacher_leave_mobile', JSON.stringify(state));
         document.getElementById('annualLeaveInput').value = state.settings.annualDays;
         
-        // 1. 渲染主表
-        let html = `<table><tr><th>假別類型</th><th>已使用</th><th>單項剩餘</th></tr>`;
+        let html = `<table><tr><th>假別</th><th>已使用</th><th>剩餘</th></tr>`;
         const keys = ["身心調適假", "事假", "家庭照顧假", "病假", "特休", "加班補休", "公假補休"];
         
         keys.forEach(key => {
@@ -137,49 +160,40 @@
             
             if (key === "家庭照顧假") {
                 let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
-                html += `<tr class="personal-summary-row"><td>🔸事假體系(合計)</td><td>${formatTime(pUsed)}</td><td>剩餘: ${formatTime(56 - pUsed)}</td></tr>`;
+                html += `<tr class="personal-summary-row"><td>🔸事假體系(合計)</td><td>${formatTime(pUsed)}</td><td>餘:${formatTime(56 - pUsed)}</td></tr>`;
             }
         });
         html += `</table>`;
         document.getElementById('statusTable').innerHTML = html;
 
-        // 2. 核心精算邏輯
         calculateFinalSafety();
     }
 
     function calculateFinalSafety() {
-        // A. 事病假安全額度 (14天 = 112小時)
+        // 安全線: 14天(112小時)
         let personalUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
         let sickUsed = state.used["病假"];
-        let totalPersonalSickUsed = personalUsed + sickUsed;
-        let safetyRemain = 112 - totalPersonalSickUsed; // 考績線剩餘時數
+        let safetyRemain = Math.max(0, 112 - (personalUsed + sickUsed));
 
-        // B. 特休可用額度 (限制10天 = 80小時)
+        // 特休: 僅計10天(80小時)
         let specialUsed = state.used["特休"];
-        let specialUsefulRemain = Math.max(0, 80 - specialUsed); // 10天扣掉已休
+        let specialUsefulRemain = Math.max(0, 80 - specialUsed);
 
-        // C. 補休額度
-        let overRem = state.limits["加班補休"] - state.used["加班補休"];
-        let offiRem = state.limits["公假補休"] - state.used["公假補休"];
+        // 補休
+        let compRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]);
         
-        // D. 總加總
-        let grandTotalH = safetyRemain + specialUsefulRemain + overRem + offiRem;
+        let grandTotalH = safetyRemain + specialUsefulRemain + compRem;
 
         document.getElementById('analysisPanel').innerHTML = `
-            <span class="analysis-title">📊 本學期剩餘可休假總數 (安全精算)</span>
-            <table style="background:none; border:none;">
-                <tr><td style="text-align:left; border:none;">1. 事病假考績線剩餘 (事+病 ≤ 14日)</td><td style="border:none;">${formatTime(safetyRemain)}</td></tr>
-                <tr><td style="text-align:left; border:none;">2. 特休可用餘額 (僅取上限 10日)</td><td style="border:none;">${formatTime(specialUsefulRemain)}</td></tr>
-                <tr><td style="text-align:left; border:none;">3. 加班/公假補休剩餘</td><td style="border:none;">${formatTime(overRem + offiRem)}</td></tr>
-                <tr style="border-top: 2px solid #4caf50;">
-                    <td style="text-align:left; border:none; font-weight:bold; font-size:16px;">💡 總計還能請 (不影響考績)：</td>
-                    <td style="border:none;"><span class="highlight-num">${formatTime(grandTotalH)}</span></td>
-                </tr>
-            </table>
-            <p style="font-size:12px; color:#666; margin-top:10px;">
-                * 註1：已預留並優先扣除 3 日身心調適假空間。<br>
-                * 註2：考績線計算包含：事假、身心、家庭假、病假。
-            </p>
+            <span class="analysis-title">📊 學期剩餘假總額 (不扣考績)</span>
+            <div style="line-height: 1.8; font-size: 14px;">
+                1. 事病假考績安全餘額：${formatTime(safetyRemain)}<br>
+                2. 特休可用餘額 (上限10日)：${formatTime(specialUsefulRemain)}<br>
+                3. 補休合計餘額：${formatTime(compRem)}<br>
+                <div style="margin-top:10px; border-top: 1px solid #4caf50; padding-top: 10px;">
+                    <strong>💡 您這學期還能休：<span class="highlight-num">${formatTime(grandTotalH)}</span></strong>
+                </div>
+            </div>
         `;
     }
 
@@ -197,9 +211,9 @@
         let tSum = pSum + tempUsed["病假"];
 
         if (tempUsed[type] > state.limits[type]) return alert(`超過 ${type} 單項上限！`);
-        if (pSum > 56) return alert("事假體系(含身心、家庭)合計不可超過 7 日！");
+        if (pSum > 56) return alert("事假體系合計不可超過 7 日！");
         if (tSum > 112) {
-            if(!confirm("⚠️ 已超過 14 日考績紅線！確定要記錄嗎？")) return;
+            if(!confirm("⚠️ 警告：已超過 14 日考績紅線！是否記錄？")) return;
         }
 
         state.used = tempUsed;
