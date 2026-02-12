@@ -10,13 +10,11 @@
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #f0f2f5; overflow: hidden; }
         body { font-family: "Microsoft JhengHei", sans-serif; display: flex; justify-content: center; align-items: center; }
 
+        /* 核心卡片 */
         .card { 
             background: white; 
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            max-width: 700px; 
+            display: flex; flex-direction: column;
+            width: 100%; height: 100%; max-width: 700px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
             overflow: hidden;
         }
@@ -30,16 +28,15 @@
             .card { max-width: 100vw; height: 100vh; border-radius: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
         }
 
-        .content-wrapper { padding: 15px; overflow-y: auto; scrollbar-width: none; flex: 1; }
+        .content-wrapper { padding: 15px; overflow-y: auto; flex: 1; scrollbar-width: none; }
         .content-wrapper::-webkit-scrollbar { display: none; }
 
-        h2 { color: #202124; text-align: center; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #202124; text-align: center; margin: 10px 0 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
         .section { padding: 12px; border-radius: 10px; margin-bottom: 12px; border: 1px solid #ddd; }
         .setup-bg { background: #fffde7; border-color: #ffe082; } 
         .apply-bg { background: #e8f0fe; border-color: #c2d7ff; } 
         .cancel-bg { background: #fbe9e7; border-color: #ffccbc; } 
-        .history-bg { background: #f5f5f5; border-color: #ddd; }
 
         .section-title { font-weight: bold; margin-bottom: 8px; display: block; font-size: 14px; }
         .row { display: flex; gap: 4px; align-items: center; margin-bottom: 6px; }
@@ -49,6 +46,9 @@
         .btn-add { background: #f57c00; }
         .btn-apply { background: #1a73e8; }
         .btn-cancel { background: #d32f2f; }
+        
+        /* 歷史紀錄按鈕 */
+        .btn-history { width: 100%; padding: 10px; background: #607d8b; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 12px; font-size: 14px; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 5px; background: white; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: center; font-size: 12px; }
@@ -57,19 +57,29 @@
         .personal-group-row { background-color: #fff8f0 !important; }
         .personal-summary-row { background-color: #ffe0b2 !important; font-weight: bold; color: #e65100; }
 
-        .final-analysis-card { background-color: #e8f5e9; border: 2px solid #4caf50; padding: 12px; border-radius: 10px; margin-top: 15px; }
+        .final-analysis-card { background-color: #e8f5e9; border: 2px solid #4caf50; padding: 12px; border-radius: 8px; margin-top: 15px; }
         .analysis-line { font-size: 13px; line-height: 2; display: flex; justify-content: space-between; }
         .highlight-num { color: #d32f2f; font-weight: bold; font-size: 16px; }
 
-        /* 歷史紀錄細節 */
-        .history-list { font-size: 11px; max-height: 120px; overflow-y: auto; background: white; border-radius: 5px; border: 1px solid #eee; }
-        .history-item { padding: 6px 10px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
-        .h-time { color: #888; font-size: 10px; }
-        .h-action-add { color: #f57c00; font-weight: bold; } /* 存入橘色 */
-        .h-action-apply { color: #1a73e8; font-weight: bold; } /* 請假藍色 */
-        .h-action-cancel { color: #d32f2f; font-weight: bold; } /* 銷假紅色 */
+        /* 彈窗 (Modal) 樣式 */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content { 
+            background: white; width: 90%; max-width: 500px; max-height: 80vh; 
+            border-radius: 15px; display: flex; flex-direction: column; overflow: hidden;
+        }
+        .modal-header { padding: 15px; background: #f5f5f5; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 10px; }
+        .history-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; font-size: 12px; }
+        .h-time { color: #888; font-size: 11px; }
+        .h-action-add { color: #f57c00; font-weight: bold; }
+        .h-action-apply { color: #1a73e8; font-weight: bold; }
+        .h-action-cancel { color: #d32f2f; font-weight: bold; }
+        .close-modal { cursor: pointer; font-size: 20px; color: #999; padding: 0 10px; }
 
-        .btn-reset { width: 100%; background: none; color: #ccc; border: none; cursor: pointer; margin-top: 15px; font-size: 11px; text-decoration: underline; padding-bottom: 20px; }
+        .btn-reset { width: 100%; background: none; color: #ccc; border: none; cursor: pointer; margin-top: 15px; font-size: 10px; text-decoration: underline; padding-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -88,10 +98,7 @@
                 </select>
             </div>
             <div class="row">
-                <select id="compType" style="flex:1;">
-                    <option value="加班補休">加班補休</option>
-                    <option value="公假補休">公假補休</option>
-                </select>
+                <select id="compType" style="flex:1;"><option value="加班補休">加班補休</option><option value="公假補休">公假補休</option></select>
                 <select id="addDays"></select>日 <select id="addHours"></select>時
                 <button class="btn btn-add" onclick="addCompLimit()">存入</button>
             </div>
@@ -123,18 +130,24 @@
             </div>
         </div>
 
-        <div class="section history-bg">
-            <span class="section-title" style="color:#555;">📜 歷史異動紀錄 (最近30筆)</span>
-            <div class="history-list" id="historyList">
-                <div style="text-align:center; color:#999; padding:10px;">尚無異動紀錄</div>
-            </div>
-        </div>
+        <button class="btn-history" onclick="toggleModal(true)">📜 查看歷史異動紀錄</button>
 
         <div id="statusTable"></div>
         
         <div class="final-analysis-card" id="analysisPanel"></div>
 
         <button class="btn-reset" onclick="resetData()">重置所有數據 (新學期使用)</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="historyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span>📜 歷史異動紀錄</span>
+            <span class="close-modal" onclick="toggleModal(false)">&times;</span>
+        </div>
+        <div class="modal-body" id="modalHistoryBody">
+            </div>
     </div>
 </div>
 
@@ -151,8 +164,7 @@
         });
     }
 
-    // 資料儲存鍵名更新
-    const STORAGE_KEY = 'teacher_leave_complete_v1';
+    const STORAGE_KEY = 'teacher_leave_modal_v1';
 
     let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
         limits: { "身心調適假": 24, "事假": 56, "家庭照顧假": 56, "病假": 224, "特休": 0, "加班補休": 0, "公假補休": 0 },
@@ -161,37 +173,33 @@
         history: [] 
     };
 
+    function toggleModal(show) {
+        document.getElementById('historyModal').style.display = show ? 'flex' : 'none';
+        if(show) updateHistoryUI();
+    }
+
     function formatTime(totalH) {
         if (totalH < 0) return "0日0時";
         return Math.floor(totalH / 8) + "日" + (totalH % 8) + "時";
     }
 
-    // 核心紀錄函式
     function addLog(action, type, d, h) {
         const now = new Date();
         const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
-        state.history.unshift({
-            time: timeStr,
-            action: action, // "存入", "請假", "銷假"
-            type: type,
-            amount: `${d}日${h}時`
-        });
-        if(state.history.length > 30) state.history.pop();
+        state.history.unshift({ time: timeStr, action, type, amount: `${d}日${h}時` });
+        // 不再限制長度 (state.history.pop() 已移除)
     }
 
     function addCompLimit() {
         let type = document.getElementById('compType').value;
         let d = parseInt(document.getElementById('addDays').value);
         let h = parseInt(document.getElementById('addHours').value);
-        let total = (d * 8 + h);
-        if (total <= 0) return;
-        
-        state.limits[type] += total;
-        addLog("存入", type, d, h); // 新增存入紀錄
+        if (d*8+h <= 0) return;
+        state.limits[type] += (d * 8 + h);
+        addLog("存入", type, d, h);
         updateView();
-        alert(`已成功存入 ${type} 額度`);
-        document.getElementById('addDays').value = 0;
-        document.getElementById('addHours').value = 0;
+        alert("存入成功");
+        document.getElementById('addDays').value = 0; document.getElementById('addHours').value = 0;
     }
 
     function updateLimits() {
@@ -201,94 +209,82 @@
         updateView();
     }
 
+    function updateHistoryUI() {
+        const body = document.getElementById('modalHistoryBody');
+        if (state.history.length === 0) {
+            body.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">尚無異動紀錄</div>';
+        } else {
+            body.innerHTML = state.history.map(h => {
+                let cls = 'h-action-apply';
+                if(h.action === '存入') cls = 'h-action-add';
+                if(h.action === '銷假') cls = 'h-action-cancel';
+                return `
+                <div class="history-item">
+                    <span><span class="h-time">${h.time}</span> <b>${h.type}</b></span>
+                    <span class="${cls}">${h.action} ${h.amount}</span>
+                </div>`;
+            }).join('');
+        }
+    }
+
     function updateView() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         document.getElementById('annualLeaveInput').value = state.settings.annualDays;
         
-        // 更新歷史紀錄顯示
-        const listEl = document.getElementById('historyList');
-        if (state.history.length === 0) {
-            listEl.innerHTML = '<div style="text-align:center; color:#999; padding:10px;">尚無異動紀錄</div>';
-        } else {
-            listEl.innerHTML = state.history.map(h => {
-                let actionClass = 'h-action-apply';
-                if(h.action === '存入') actionClass = 'h-action-add';
-                if(h.action === '銷假') actionClass = 'h-action-cancel';
-                return `
-                <div class="history-item">
-                    <span><span class="h-time">${h.time}</span> <b>${h.type}</b></span>
-                    <span class="${actionClass}">${h.action} ${h.amount}</span>
-                </div>`;
-            }).join('');
-        }
-
-        // 更新狀態表
-        let html = `<table><tr><th>假別名稱</th><th>已用時數</th><th>剩餘時數</th></tr>`;
+        let html = `<table><tr><th>假別全名</th><th>已用時數</th><th>剩餘時數</th></tr>`;
         const keys = ["身心調適假", "事假", "家庭照顧假", "病假", "特休", "加班補休", "公假補休"];
         keys.forEach(key => {
-            let isPersonal = ["事假", "身心調適假", "家庭照顧假"].includes(key);
-            let rowClass = isPersonal ? 'class="personal-group-row"' : '';
-            html += `<tr ${rowClass}><td>${key}</td><td>${formatTime(state.used[key])}</td><td>${formatTime(state.limits[key] - state.used[key])}</td></tr>`;
+            let isP = ["事假", "身心調適假", "家庭照顧假"].includes(key);
+            html += `<tr ${isP?'class="personal-group-row"':''}><td>${key}</td><td>${formatTime(state.used[key])}</td><td>${formatTime(state.limits[key]-state.used[key])}</td></tr>`;
             if (key === "家庭照顧假") {
-                let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
-                html += `<tr class="personal-summary-row"><td>🔸事假體系合計</td><td>${formatTime(pUsed)}</td><td>餘:${formatTime(56 - pUsed)}</td></tr>`;
+                let pU = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
+                html += `<tr class="personal-summary-row"><td>🔸事假體系合計</td><td>${formatTime(pU)}</td><td>餘:${formatTime(56-pU)}</td></tr>`;
             }
         });
         document.getElementById('statusTable').innerHTML = html + `</table>`;
 
-        // 三行精算
-        let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
-        let safetyRem = Math.max(0, 112 - (pUsed + state.used["病假"])); 
-        let specRem = Math.max(0, 80 - state.used["特休"]);             
-        let compRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]); 
+        let pU = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"];
+        let safRem = Math.max(0, 112 - (pU + state.used["病假"])); 
+        let speRem = Math.max(0, 80 - state.used["特休"]);             
+        let comRem = (state.limits["加班補休"] - state.used["加班補休"]) + (state.limits["公假補休"] - state.used["公假補休"]); 
 
         document.getElementById('analysisPanel').innerHTML = `
-            <span style="color:#2e7d32; font-size:15px; font-weight:bold; text-align:center; display:block; margin-bottom:8px;">📊 學期剩餘假精算 (不扣考績)</span>
-            <div class="analysis-line"><span>● 事病假安全餘額 (14日內)</span> <span>${formatTime(safetyRem)}</span></div>
-            <div class="analysis-line"><span>● 特休可用餘額 (10日內)</span> <span>${formatTime(specRem)}</span></div>
-            <div class="analysis-line"><span>● 補休合計餘額</span> <span>${formatTime(compRem)}</span></div>
+            <span class="analysis-title">📊 學期剩餘假精算 (不扣考績)</span>
+            <div class="analysis-line"><span>● 事病假安全餘額 (14日內)</span> <span>${formatTime(safRem)}</span></div>
+            <div class="analysis-line"><span>● 特休可用餘額 (10日內)</span> <span>${formatTime(speRem)}</span></div>
+            <div class="analysis-line"><span>● 補休合計餘額</span> <span>${formatTime(comRem)}</span></div>
             <div style="margin-top:8px; border-top:1px dashed #4caf50; padding-top:8px; text-align:right;">
-                <strong>💡 總計可休：<span class="highlight-num">${formatTime(safetyRem + specRem + compRem)}</span></strong>
+                <strong>💡 總計可休：<span class="highlight-num">${formatTime(safRem + speRem + comRem)}</span></strong>
             </div>
         `;
     }
 
     function applyLeave() {
-        let type = document.getElementById('leaveType').value;
+        let t = document.getElementById('leaveType').value;
         let d = parseInt(document.getElementById('leaveDays').value);
         let h = parseInt(document.getElementById('leaveHours').value);
-        let total = (d * 8 + h);
-        if (total <= 0) return;
-        if (state.used[type] + total > state.limits[type]) return alert("超過單項上限");
-        if (["事假", "身心調適假", "家庭照顧假"].includes(type)) {
-            let pUsed = state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"] + total;
-            if (pUsed > 56) return alert("事假體系不可超過 7 日");
+        if (d*8+h <= 0) return;
+        if (state.used[t] + (d*8+h) > state.limits[t]) return alert("超過單項上限");
+        if (["事假", "身心調適假", "家庭照顧假"].includes(t)) {
+            if ((state.used["事假"] + state.used["身心調適假"] + state.used["家庭照顧假"] + (d*8+h)) > 56) return alert("事假體系不可超過 7 日");
         }
-        state.used[type] += total;
-        addLog("請假", type, d, h);
-        updateView();
-        alert("登記成功");
-        document.getElementById('leaveDays').value = 0;
-        document.getElementById('leaveHours').value = 0;
+        state.used[t] += (d*8+h);
+        addLog("請假", t, d, h); updateView(); alert("登記成功");
+        document.getElementById('leaveDays').value = 0; document.getElementById('leaveHours').value = 0;
     }
 
     function cancelLeave() {
-        let type = document.getElementById('cancelType').value;
+        let t = document.getElementById('cancelType').value;
         let d = parseInt(document.getElementById('cancelDays').value);
         let h = parseInt(document.getElementById('cancelHours').value);
-        let total = (d * 8 + h);
-        if (total <= 0) return;
-        if (state.used[type] - total < 0) return alert("銷假時數不可超過已使用時數");
-        
-        state.used[type] -= total;
-        addLog("銷假", type, d, h);
-        updateView();
-        alert("銷假成功");
-        document.getElementById('cancelDays').value = 0;
-        document.getElementById('cancelHours').value = 0;
+        if (d*8+h <= 0) return;
+        if (state.used[t] - (d*8+h) < 0) return alert("銷假時數不可超過已用時數");
+        state.used[t] -= (d*8+h);
+        addLog("銷假", t, d, h); updateView(); alert("銷假成功");
+        document.getElementById('cancelDays').value = 0; document.getElementById('cancelHours').value = 0;
     }
 
-    function resetData() { if(confirm("確定重置所有數據與紀錄？")) { localStorage.clear(); location.reload(); } }
+    function resetData() { if(confirm("確定重置所有數據？紀錄也將消失。")) { localStorage.clear(); location.reload(); } }
 
     initDropdowns();
     updateView();
